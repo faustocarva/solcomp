@@ -36,7 +36,7 @@ func NewSolidityCompiler(storageFolder string) *solidityCompiler {
 	return &solidityCompiler{storageFolder: storageFolder, versions: versions}
 }
 
-func (c *solidityCompiler) CompileSource(contractName string, contractSource string) (*Contract, error) {
+func (c *solidityCompiler) CompileSource(contractName string, contractSource string) (*CompileResult, error) {
 	if len(contractSource) == 0 {
 		return nil, ErrEmptySourceFile
 	}
@@ -76,6 +76,21 @@ func (c *solidityCompiler) CompileSource(contractName string, contractSource str
 		return nil, err
 	}
 
+	if contractName == "" {
+		// Return all contracts if contractName is empty
+		allContracts := make([]*Contract, 0)
+		for name, contract := range contracts {
+			parsedName := parseStdinSolidityContractName(name)
+			abiDefinition, err := json.Marshal(contract.Info.AbiDefinition)
+			if err != nil {
+				return nil, err
+			}
+			allContracts = append(allContracts, NewContract(parsedName, string(abiDefinition), contract.Code, contract.RuntimeCode))
+		}
+		return &CompileResult{AllContracts: allContracts}, nil
+	}
+
+	// Return a specific contract if contractName is provided
 	var compiledContract *compiler.Contract
 	for name, contract := range contracts {
 		parsedName := parseStdinSolidityContractName(name)
@@ -92,7 +107,9 @@ func (c *solidityCompiler) CompileSource(contractName string, contractSource str
 	if err != nil {
 		return nil, err
 	}
-	return NewContract(contractName, string(abiDefinition), compiledContract.Code, compiledContract.RuntimeCode), nil
+	return &CompileResult{
+		SingleContract: NewContract(contractName, string(abiDefinition), compiledContract.Code, compiledContract.RuntimeCode),
+	}, nil
 }
 
 func (c *solidityCompiler) getSolcBinaryLocationIfExists(version *semver.Version) (string, bool) {

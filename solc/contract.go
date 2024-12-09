@@ -16,3 +16,8 @@ func NewContract(name, abiDefinition, deploymentBytecode string, runtimeBytecode
 		RuntimeBytecode:    runtimeBytecode,
 	}
 }
+
+type CompileResult struct {
+	SingleContract *Contract   // Holds a single contract if one is requested
+	AllContracts   []*Contract // Holds all contracts if no specific contract is requested
+}
