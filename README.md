@@ -36,10 +36,12 @@ To compile a Solidity contract, use the following command:
 This command will compile the MyContract contract in the MyContract.sol file and output the contract's ABI and bytecode to the current directory.
 
 ## File Output:
-- The compiled ABI and bytecode will be saved in files named <contract-name>_abi.json, <contract-name>_deployment_bytecode.bin, and <contract-name>_runtime_bytecode.bin.
+- The compiled ABI and bytecode will be saved in files named \<contract-name\>_abi.json, \<contract-name\>_deployment_bytecode.bin, and \<contract-name\>_runtime_bytecode.bin.
 
 ## Development:
 
 Running the project locally:
 To run the project without building the binary, you can use:
+```
    go run main.go -file=<path-to-solidity-file> -contract=<contract-name>
+```
